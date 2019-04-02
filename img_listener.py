@@ -18,36 +18,38 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
 import time
+# from Queue import Queue
 
-# Instantiate CvBridge
-bridge = CvBridge()
+delta = 0
 
-def image_callback(ros_data):
-    print("Received an image!")
-    # try:
-    #     # Convert your ROS Image message to OpenCV2
-    #     cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
-    # except CvBridgeError, e:
-    #     print(e)
-    # else:
-    #     # Save your OpenCV2 image as a jpeg
-    #     cv2.imwrite('camera_image.jpeg', cv2_img)
+def img_callback(ros_data):
+    global delta
+    print(int(round(time.time() * 1000)) - delta)
+    delta = int(round(time.time() * 1000))
 
-    #### direct conversion to CV2 ####
+    # print("Received an image!")
     np_arr = np.fromstring(ros_data.data, np.uint8)
-    image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-    seconds = time.time()
-    cv2.imwrite('camera_image'+str(seconds)+'.jpeg', image_np)
+    # image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    image_np = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+
+    cv2.imshow("Image window", image_np)
+    cv2.waitKey(1)
+
 
 def main():
+
     rospy.init_node('image_listener')
-    # Define your image topic
-    # image_topic = "/cameras/left_hand_camera/image"
-    image_topic = "chatterImg"
-    # Set up your subscriber and define its callback
-    rospy.Subscriber(image_topic, CompressedImage, image_callback)
-    # Spin until ctrl + c
-    rospy.spin()
+    rospy.Subscriber("camera/compressed", CompressedImage,
+                     img_callback,  queue_size=1)
+
+    # delta = int(round(time.time() * 1000))
+
+    try:
+        rospy.spin()
+    except KeyboardInterrupt:
+        print('Shutting down...')
+    cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     main()

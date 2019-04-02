@@ -53,7 +53,7 @@ def listener():
     rospy.init_node('listener', anonymous=True)
 
     # rospy.Subscriber('chatter', String, callback)
-    rospy.Subscriber('chatterResponse', String, callback)
+    rospy.Subscriber('djiSDK/flightLog', String, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
