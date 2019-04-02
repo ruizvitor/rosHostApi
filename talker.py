@@ -36,8 +36,16 @@
 ## Simple talker demo that published std_msgs/Strings messages
 ## to the 'chatter' topic
 
+import sys
+import signal
 import rospy
 from std_msgs.msg import String
+
+def signal_term_handler(signal, frame):
+    rospy.logerr('User KeyboardInterrupt')
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_term_handler)
+
 
 def talker():
     pub = rospy.Publisher('djiSDK/listener', String, queue_size=10)
@@ -47,20 +55,6 @@ def talker():
         mystr = raw_input()
         rospy.loginfo(mystr)
         pub.publish(mystr)
-
-    # # rate = rospy.Rate(10) # 10hz
-    # # rate = rospy.Rate(0.01) # 0.001hz
-    # rate = rospy.Rate(0.09) # 0.001hz
-    # # rate = rospy.Rate(0.001) # 0.001hz
-    # while not rospy.is_shutdown():
-    #     # hello_str = "hello world %s" % rospy.get_time()
-    #     # hello_str = "host say hi %s" % rospy.get_time()
-    #     # hello_str = "photo"
-    #     # hello_str = "download"
-    #     hello_str = "delete"
-    #     rospy.loginfo(hello_str)
-    #     pub.publish(hello_str)
-    #     rate.sleep()
 
 if __name__ == '__main__':
     try:
