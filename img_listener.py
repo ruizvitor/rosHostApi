@@ -12,13 +12,10 @@
 import rospy
 # ROS Image message
 from sensor_msgs.msg import CompressedImage
-# ROS Image message -> OpenCV2 image converter
-from cv_bridge import CvBridge, CvBridgeError
 # OpenCV2 for saving an image
 import cv2
 import numpy as np
 import time
-# from Queue import Queue
 
 delta = 0
 
@@ -27,9 +24,7 @@ def img_callback(ros_data):
     print(int(round(time.time() * 1000)) - delta)
     delta = int(round(time.time() * 1000))
 
-    # print("Received an image!")
     np_arr = np.fromstring(ros_data.data, np.uint8)
-    # image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
     image_np = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
 
     cv2.imshow("Image window", image_np)
@@ -41,8 +36,6 @@ def main():
     rospy.init_node('image_listener')
     rospy.Subscriber("camera/compressed", CompressedImage,
                      img_callback,  queue_size=1)
-
-    # delta = int(round(time.time() * 1000))
 
     try:
         rospy.spin()
